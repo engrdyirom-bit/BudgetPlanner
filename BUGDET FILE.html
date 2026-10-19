@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Budget Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-sky-600 text-white p-2.5 rounded-xl shadow-md shadow-sky-200">
+                        <i class="fa-solid fa-wallet text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-900 leading-tight">WeeklyBudget</h1>
+                        <p class="text-xs text-slate-500 font-medium">Smart Expense Tracker</p>
+                    </div>
+                </div>
+
+                <!-- Budget Target Setting -->
+                <div class="flex items-center gap-3">
+                    <button id="setBudgetBtn" onclick="openBudgetModal()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3.5 py-2 rounded-xl transition text-sm">
+                        <i class="fa-solid fa-pen-to-square text-sky-600"></i>
+                        <span class="hidden sm:inline">Set Weekly Target</span>
+                    </button>
+                    <button onclick="resetAllData()" title="Reset All Data" class="text-slate-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50 transition">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- 1. OVERVIEW DASHBOARD -->
+        <section>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                <!-- Total Budget Card -->
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Weekly Target</p>
+                            <h2 id="displayBudget" class="text-2xl font-extrabold text-slate-800 mt-1">Php0.00</h2>
+                        </div>
+                        <div class="bg-blue-50 text-blue-600 p-3 rounded-xl">
+                            <i class="fa-solid fa-bullseye text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs text-slate-500 flex items-center gap-1">
+                        <i class="fa-solid fa-info-circle text-slate-400"></i>
+                        <span>Target allowance for the week</span>
+                    </div>
+                </div>
+
+                <!-- Total Income Card -->
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Income</p>
+                            <h2 id="displayIncome" class="text-2xl font-extrabold text-emerald-600 mt-1">Php0.00</h2>
+                        </div>
+                        <div class="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
+                            <i class="fa-solid fa-arrow-trend-up text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs text-emerald-600 font-medium">
+                        Added earnings this week
+                    </div>
+                </div>
+
+                <!-- Total Spent Card -->
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Spent</p>
+                            <h2 id="displaySpent" class="text-2xl font-extrabold text-rose-600 mt-1">Php0.00</h2>
+                        </div>
+                        <div class="bg-rose-50 text-rose-600 p-3 rounded-xl">
+                            <i class="fa-solid fa-arrow-trend-down text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs text-slate-500">
+                        <span id="spentPercentage" class="font-semibold text-slate-700">0%</span> of budget used
+                    </div>
+                </div>
+
+                <!-- Remaining Balance Card -->
+                <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Remaining Balance</p>
+                            <h2 id="displayBalance" class="text-2xl font-extrabold text-slate-800 mt-1">Php0.00</h2>
+                        </div>
+                        <div id="balanceIconBg" class="bg-sky-50 text-sky-600 p-3 rounded-xl">
+                            <i id="balanceIcon" class="fa-solid fa-scale-balanced text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                            <div id="budgetProgressBar" class="bg-sky-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRID LAYOUT FOR FORM & CATEGORY CHART -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- 2. EXPENSE & INCOME ENTRY FORM -->
+            <div class="lg:col-span-1 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+                <div class="flex items-center justify-between mb-5">
+                    <h2 id="formTitle" class="text-lg font-bold text-slate-800">Add Transaction</h2>
+                    <span id="cancelEditBtn" onclick="resetForm()" class="hidden text-xs text-rose-600 font-semibold cursor-pointer hover:underline">Cancel Edit</span>
+                </div>
+
+                <form id="transactionForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="editId" value="">
+
+                    <!-- Type Switcher -->
+                    <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl mb-4">
+                        <button type="button" id="typeExpenseBtn" onclick="setTransactionType('expense')" class="py-2 text-xs font-bold rounded-lg transition shadow-sm bg-white text-slate-800">Expense</button>
+                        <button type="button" id="typeIncomeBtn" onclick="setTransactionType('income')" class="py-2 text-xs font-bold rounded-lg transition text-slate-500 hover:text-slate-800">Income</button>
+                    </div>
+
+                    <!-- Amount & Category -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Amount (Php)</label>
+                            <input type="number" id="txAmount" step="0.01" min="0.01" placeholder="0.00" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-sm font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Category</label>
+                            <select id="txCategory" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-sm font-medium bg-white">
+                                <option value="" disabled selected>Select category</option>
+                                <option value="Food">Food & Dining</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Utilities">Utilities & Bills</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Income">Income / Salary</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Date & Day of Week -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Date</label>
+                            <input type="date" id="txDate" onchange="autoSelectDay(this.value)" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-sm font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Day of Week</label>
+                            <select id="txDay" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-sm font-medium bg-white">
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                                <option value="Sunday">Sunday</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Description</label>
+                        <input type="text" id="txDesc" placeholder="e.g. Grocery shopping, Gas fill up" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-sm font-medium">
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="w-full mt-2 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded-xl transition shadow-md shadow-sky-100 flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>Add Entry</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- 5. CATEGORY BREAKDOWN -->
+            <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">Category Breakdown</h2>
+                        <p class="text-xs text-slate-500">Expense distribution for the week</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center flex-1">
+                    <!-- Donut Chart Container -->
+                    <div class="relative flex items-center justify-center p-2 min-h-[200px]">
+                        <canvas id="categoryChart" class="max-h-[220px]"></canvas>
+                        <div id="noChartData" class="hidden absolute text-center text-slate-400 text-sm">
+                            <i class="fa-solid fa-chart-pie text-3xl mb-2 text-slate-300"></i>
+                            <p>No expenses logged yet</p>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Legend Progress Bars -->
+                    <div id="categoryBars" class="space-y-3 max-h-[220px] overflow-y-auto pr-1">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. DAILY BREAKDOWN VIEW -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="mb-5">
+                <h2 class="text-lg font-bold text-slate-800">Daily Breakdown</h2>
+                <p class="text-xs text-slate-500">Expenses grouped by day of the week</p>
+            </div>
+
+            <!-- Days Tabs -->
+            <div class="grid grid-cols-7 gap-1 sm:gap-2 mb-6 bg-slate-100 p-1.5 rounded-2xl overflow-x-auto min-w-[500px]">
+                <button onclick="selectDayTab('Monday')" id="tab-Monday" class="day-tab py-2.5 px-2 text-center rounded-xl transition text-xs font-semibold">Mon</button>
+                <button onclick="selectDayTab('Tuesday')" id="tab-Tuesday" class="day-tab py-2.5 px-2 text-center rounded-xl transition text-xs font-semibold">Tue</button>
+                <button onclick="selectDayTab('Wednesday')" id="tab-Wednesday" class="day-tab py-2.5 px-2 text-center rounded-xl transition text-xs font-semibold">Wed</button>
+                <button onclick="selectDayTab('Thursday')" id="tab-Thursday" class="day-tab py-2.5 px-2 text-center rounded-xl transition text-xs font-semibold">Thu</button>
+                <button onclick="selectDayTab('Friday')" id="tab-Friday" class="day-tab py-2.5 px-2 text-center rounded-xl transition text-xs font-semibold">Fri</button>
+                <button onclick="selectDayTab('Saturday')" id="tab-Saturday" class="day-tab py-2.5 px-2 text-center rounded-xl transition text-xs font-semibold">Sat</button>
+                <button onclick="selectDayTab('Sunday')" id="tab-Sunday" class="day-tab py-2.5 px-2 text-center rounded-xl transition text-xs font-semibold">Sun</button>
+            </div>
+
+            <!-- Active Day Content Card -->
+            <div id="dayContentCard" class="bg-slate-50 border border-slate-200/60 rounded-xl p-5">
+                <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
+                    <h3 id="selectedDayTitle" class="font-bold text-slate-800 text-base">Monday</h3>
+                    <span id="selectedDayTotal" class="text-sm font-bold text-slate-700 bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">Total Spent: Php0.00</span>
+                </div>
+                <div id="dayTransactionsList" class="space-y-2.5 max-h-60 overflow-y-auto">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. TRANSACTION LIST & SEARCH -->
+        <section class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">All Transactions</h2>
+                    <p class="text-xs text-slate-500">History of all income and expenses logged</p>
+                </div>
+
+                <!-- Search & Filters -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- Search Input -->
+                    <div class="relative flex-1 sm:flex-initial">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="Search description..." class="w-full sm:w-48 pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500">
+                    </div>
+
+                    <!-- Category Filter -->
+                    <select id="filterCategory" onchange="renderTransactions()" class="text-xs py-2 px-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 bg-white font-medium text-slate-600">
+                        <option value="All">All Categories</option>
+                        <option value="Food">Food</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Income">Income</option>
+                        <option value="Others">Others</option>
+                    </select>
+
+                    <!-- Type Filter -->
+                    <select id="filterType" onchange="renderTransactions()" class="text-xs py-2 px-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 bg-white font-medium text-slate-600">
+                        <option value="All">All Types</option>
+                        <option value="expense">Expenses</option>
+                        <option value="income">Income</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50">
+                            <th class="py-3 px-4 rounded-l-lg">Date & Day</th>
+                            <th class="py-3 px-4">Description</th>
+                            <th class="py-3 px-4">Category</th>
+                            <th class="py-3 px-4">Type</th>
+                            <th class="py-3 px-4 text-right">Amount</th>
+                            <th class="py-3 px-4 rounded-r-lg text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody" class="divide-y divide-slate-100 text-sm">
+                        <!-- Populated dynamically -->
+                    </tbody>
+                </table>
+                <div id="noTransactions" class="hidden py-12 text-center text-slate-400 text-sm">
+                    <i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300"></i>
+                    <p>No transactions found matching your criteria</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Budget Target Modal -->
+    <div id="budgetModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-transform duration-200 scale-95" id="modalContent">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-slate-800">Set Weekly Budget Target</h3>
+                <button onclick="closeBudgetModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-5">Specify the maximum amount you plan to spend this week to keep track of your goals.</p>
+            
+            <div class="mb-5">
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Weekly Target Amount (Php)</label>
+                <input type="number" id="budgetInput" step="0.01" min="0" placeholder="e.g. 500.00" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-base font-semibold">
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button onclick="closeBudgetModal()" class="px-4 py-2.5 rounded-xl text-slate-600 font-medium hover:bg-slate-100 text-sm">Cancel</button>
+                <button onclick="saveBudget()" class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm shadow-md shadow-sky-100">Save Target</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Box -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMessage" class="text-xs font-medium">Action completed successfully</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 mt-auto">
+        <p>Weekly Budget Tracker &copy; 2026. Data stored locally on your device.</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // State Management
+        let transactions = [];
+        let weeklyBudget = 500;
+        let activeType = 'expense';
+        let currentDayTab = 'Monday';
+        let categoryChartInstance = null;
+
+        // Category Palette Configuration
+        const categoryColors = {
+            'Food': '#f97316',          // Orange
+            'Transportation': '#3b82f6',// Blue
+            'Utilities': '#eab308',     // Yellow
+            'Entertainment': '#a855f7', // Purple
+            'Shopping': '#ec4899',      // Pink
+            'Income': '#10b981',        // Emerald
+            'Others': '#64748b'         // Slate
+        };
+
+        const categoryIcons = {
+            'Food': 'fa-utensils',
+            'Transportation': 'fa-car',
+            'Utilities': 'fa-bolt',
+            'Entertainment': 'fa-gamepad',
+            'Shopping': 'fa-bag-shopping',
+            'Income': 'fa-money-bill-wave',
+            'Others': 'fa-box'
+        };
+
+        // Initialize Application
+        window.onload = function() {
+            loadFromLocalStorage();
+            setTodayDate();
+            initChart();
+            renderAll();
+        };
+
+        // Set Default Date in Form
+        function setTodayDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            let mm = today.getMonth() + 1;
+            let dd = today.getDate();
+
+            if (mm < 10) mm = '0' + mm;
+            if (dd < 10) dd = '0' + dd;
+
+            const formattedToday = `Php{yyyy}-Php{mm}-Php{dd}`;
+            document.getElementById('txDate').value = formattedToday;
+            autoSelectDay(formattedToday);
+        }
+
+        // Auto-select Day of Week from Date Picker
+        function autoSelectDay(dateString) {
+            if (!dateString) return;
+            const date = new Date(dateString + 'T00:00:00');
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayName = days[date.getDay()];
+            document.getElementById('txDay').value = dayName;
+        }
+
+        // Local Storage Methods
+        function loadFromLocalStorage() {
+            const savedBudget = localStorage.getItem('wb_budget');
+            if (savedBudget !== null) {
+                weeklyBudget = parseFloat(savedBudget);
+            }
+
+            const savedTx = localStorage.getItem('wb_transactions');
+            if (savedTx !== null) {
+                try {
+                    transactions = JSON.parse(savedTx);
+                } catch(e) {
+                    transactions = [];
+                }
+            } else {
+                // Populate default demo data if empty
+                transactions = [
+                    { id: '1', type: 'income', amount: 800, category: 'Income', date: '2026-10-19', day: 'Monday', desc: 'Weekly Salary' },
+                    { id: '2', type: 'expense', amount: 45.50, category: 'Food', date: '2026-10-19', day: 'Monday', desc: 'Weekly Groceries' },
+                    { id: '3', type: 'expense', amount: 15.00, category: 'Transportation', date: '2026-10-20', day: 'Tuesday', desc: 'Bus Pass' },
+                    { id: '4', type: 'expense', amount: 65.00, category: 'Utilities', date: '2026-10-21', day: 'Wednesday', desc: 'Electricity Bill' }
+                ];
+                saveToLocalStorage();
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('wb_budget', weeklyBudget.toString());
+            localStorage.setItem('wb_transactions', JSON.stringify(transactions));
+        }
+
+        function resetAllData() {
+            if (confirm("Are you sure you want to reset all budget data and transactions?")) {
+                localStorage.clear();
+                weeklyBudget = 500;
+                transactions = [];
+                renderAll();
+                showToast("All data has been reset", "info");
+            }
+        }
+
+        // Render Master Function
+        function renderAll() {
+            renderDashboard();
+            renderCategoryBreakdown();
+            renderDailyBreakdown();
+            renderTransactions();
+        }
+
+        // 1. DASHBOARD LOGIC
+        function renderDashboard() {
+            let totalIncome = 0;
+            let totalSpent = 0;
+
+            transactions.forEach(tx => {
+                if (tx.type === 'income') totalIncome += tx.amount;
+                else if (tx.type === 'expense') totalSpent += tx.amount;
+            });
+
+            const balance = weeklyBudget + totalIncome - totalSpent;
+            const percentageUsed = weeklyBudget > 0 ? Math.min(Math.round((totalSpent / weeklyBudget) * 100), 100) : 0;
+
+            document.getElementById('displayBudget').innerText = formatCurrency(weeklyBudget);
+            document.getElementById('displayIncome').innerText = formatCurrency(totalIncome);
+            document.getElementById('displaySpent').innerText = formatCurrency(totalSpent);
+            document.getElementById('displayBalance').innerText = formatCurrency(balance);
+            document.getElementById('spentPercentage').innerText = `Php{percentageUsed}%`;
+
+            // Progress Bar Animation & Color
+            const progressBar = document.getElementById('budgetProgressBar');
+            progressBar.style.width = `Php{percentageUsed}%`;
+
+            if (percentageUsed >= 90) {
+                progressBar.className = "bg-rose-500 h-2 rounded-full transition-all duration-500";
+            } else if (percentageUsed >= 75) {
+                progressBar.className = "bg-amber-500 h-2 rounded-full transition-all duration-500";
+            } else {
+                progressBar.className = "bg-sky-500 h-2 rounded-full transition-all duration-500";
+            }
+
+            // Balance Card Styling
+            const balanceIconBg = document.getElementById('balanceIconBg');
+            if (balance < 0) {
+                balanceIconBg.className = "bg-rose-50 text-rose-600 p-3 rounded-xl";
+            } else {
+                balanceIconBg.className = "bg-sky-50 text-sky-600 p-3 rounded-xl";
+            }
+        }
+
+        // 2. TRANSACTION TYPE SWITCHER
+        function setTransactionType(type) {
+            activeType = type;
+            const expBtn = document.getElementById('typeExpenseBtn');
+            const incBtn = document.getElementById('typeIncomeBtn');
+
+            if (type === 'expense') {
+                expBtn.className = "py-2 text-xs font-bold rounded-lg transition shadow-sm bg-white text-slate-800";
+                incBtn.className = "py-2 text-xs font-bold rounded-lg transition text-slate-500 hover:text-slate-800";
+            } else {
+                incBtn.className = "py-2 text-xs font-bold rounded-lg transition shadow-sm bg-white text-slate-800";
+                expBtn.className = "py-2 text-xs font-bold rounded-lg transition text-slate-500 hover:text-slate-800";
+                document.getElementById('txCategory').value = 'Income';
+            }
+        }
+
+        // FORM SUBMIT HANDLER (Add / Edit)
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const editId = document.getElementById('editId').value;
+            const amount = parseFloat(document.getElementById('txAmount').value);
+            const category = document.getElementById('txCategory').value;
+            const date = document.getElementById('txDate').value;
+            const day = document.getElementById('txDay').value;
+            const desc = document.getElementById('txDesc').value.trim();
+
+            if (isNaN(amount) || amount <= 0 || !category || !date || !desc) {
+                showToast("Please fill in all details correctly.", "error");
+                return;
+            }
+
+            if (editId) {
+                // Edit mode
+                const index = transactions.findIndex(t => t.id === editId);
+                if (index !== -1) {
+                    transactions[index] = { id: editId, type: activeType, amount, category, date, day, desc };
+                    showToast("Transaction updated successfully!");
+                }
+            } else {
+                // Add mode
+                const newTx = {
+                    id: Date.now().toString(),
+                    type: activeType,
+                    amount,
+                    category,
+                    date,
+                    day,
+                    desc
+                };
+                transactions.unshift(newTx);
+                showToast("Transaction added successfully!");
+            }
+
+            saveToLocalStorage();
+            resetForm();
+            renderAll();
+        }
+
+        function editTransaction(id) {
+            const tx = transactions.find(t => t.id === id);
+            if (!tx) return;
+
+            document.getElementById('editId').value = tx.id;
+            document.getElementById('txAmount').value = tx.amount;
+            document.getElementById('txCategory').value = tx.category;
+            document.getElementById('txDate').value = tx.date;
+            document.getElementById('txDay').value = tx.day;
+            document.getElementById('txDesc').value = tx.desc;
+
+            setTransactionType(tx.type);
+
+            document.getElementById('formTitle').innerText = "Edit Transaction";
+            document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-check text-xs"></i><span>Save Changes</span>`;
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteTransaction(id) {
+            if (confirm("Are you sure you want to delete this entry?")) {
+                transactions = transactions.filter(t => t.id !== id);
+                saveToLocalStorage();
+                renderAll();
+                showToast("Entry removed", "info");
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('transactionForm').reset();
+            document.getElementById('editId').value = "";
+            document.getElementById('formTitle').innerText = "Add Transaction";
+            document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-plus text-xs"></i><span>Add Entry</span>`;
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+            setTransactionType('expense');
+            setTodayDate();
+        }
+
+        // 3. DAILY BREAKDOWN LOGIC
+        function selectDayTab(day) {
+            currentDayTab = day;
+            renderDailyBreakdown();
+        }
+
+        function renderDailyBreakdown() {
+            // Update Active Tab UI
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            days.forEach(d => {
+                const btn = document.getElementById(`tab-Php{d}`);
+                if (d === currentDayTab) {
+                    btn.className = "day-tab py-2.5 px-2 text-center rounded-xl transition text-xs font-bold bg-white text-sky-600 shadow-sm border border-slate-200/80";
+                } else {
+                    btn.className = "day-tab py-2.5 px-2 text-center rounded-xl transition text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-200/50";
+                }
+            });
+
+            document.getElementById('selectedDayTitle').innerText = currentDayTab;
+
+            // Filter Expenses for this day
+            const dayExpenses = transactions.filter(t => t.day === currentDayTab && t.type === 'expense');
+            const totalDaySpent = dayExpenses.reduce((acc, curr) => acc + curr.amount, 0);
+
+            document.getElementById('selectedDayTotal').innerText = `Total Spent: Php{formatCurrency(totalDaySpent)}`;
+
+            const container = document.getElementById('dayTransactionsList');
+            container.innerHTML = '';
+
+            if (dayExpenses.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center italic">No expenses recorded for Php{currentDayTab}.</p>`;
+                return;
+            }
+
+            dayExpenses.forEach(tx => {
+                const iconClass = categoryIcons[tx.category] || 'fa-tag';
+                const catColor = categoryColors[tx.category] || '#64748b';
+
+                const div = document.createElement('div');
+                div.className = "bg-white p-3 rounded-xl border border-slate-200/70 flex justify-between items-center text-xs shadow-2xs";
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white" style="background-color: Php{catColor}">
+                            <i class="fa-solid Php{iconClass}"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-slate-800">Php{escapeHtml(tx.desc)}</p>
+                            <p class="text-[10px] text-slate-400">Php{tx.category} &bull; Php{tx.date}</p>
+                        </div>
+                    </div>
+                    <span class="font-bold text-rose-600">-Php{formatCurrency(tx.amount)}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // 4. FILTERABLE TRANSACTION LIST
+        function renderTransactions() {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const categoryVal = document.getElementById('filterCategory').value;
+            const typeVal = document.getElementById('filterType').value;
+
+            const filtered = transactions.filter(tx => {
+                const matchesSearch = tx.desc.toLowerCase().includes(searchVal);
+                const matchesCategory = categoryVal === 'All' || tx.category === categoryVal;
+                const matchesType = typeVal === 'All' || tx.type === typeVal;
+                return matchesSearch && matchesCategory && matchesType;
+            });
+
+            const tbody = document.getElementById('transactionTableBody');
+            const noTx = document.getElementById('noTransactions');
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                noTx.classList.remove('hidden');
+                return;
+            } else {
+                noTx.classList.add('hidden');
+            }
+
+            filtered.forEach(tx => {
+                const isExpense = tx.type === 'expense';
+                const amountClass = isExpense ? 'text-rose-600 font-semibold' : 'text-emerald-600 font-semibold';
+                const amountPrefix = isExpense ? '-' : '+';
+                const badgeBg = isExpense ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600';
+                const iconClass = categoryIcons[tx.category] || 'fa-tag';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition text-xs";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-medium text-slate-500 whitespace-nowrap">
+                        Php{tx.date} <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded ml-1">Php{tx.day.slice(0,3)}</span>
+                    </td>
+                    <td class="py-3 px-4 font-medium text-slate-800">Php{escapeHtml(tx.desc)}</td>
+                    <td class="py-3 px-4 text-slate-600">
+                        <span class="inline-flex items-center gap-1.5">
+                            <i class="fa-solid Php{iconClass} text-[10px] text-slate-400"></i>
+                            Php{tx.category}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-md Php{badgeBg}">Php{tx.type}</span>
+                    </td>
+                    <td class="py-3 px-4 text-right Php{amountClass}">Php{amountPrefix}Php{formatCurrency(tx.amount)}</td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="editTransaction('Php{tx.id}')" title="Edit" class="text-slate-400 hover:text-sky-600 p-1 transition">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteTransaction('Php{tx.id}')" title="Delete" class="text-slate-400 hover:text-rose-600 p-1 transition">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 5. CATEGORY CHART & BREAKDOWN LOGIC
+        function initChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            categoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function renderCategoryBreakdown() {
+            // Aggregate expenses per category
+            const totals = {};
+            let grandTotalExpenses = 0;
+
+            transactions.forEach(tx => {
+                if (tx.type === 'expense') {
+                    totals[tx.category] = (totals[tx.category] || 0) + tx.amount;
+                    grandTotalExpenses += tx.amount;
+                }
+            });
+
+            const categories = Object.keys(totals);
+            const dataValues = Object.values(totals);
+            const bgColors = categories.map(cat => categoryColors[cat] || '#64748b');
+
+            const noChartData = document.getElementById('noChartData');
+            const barsContainer = document.getElementById('categoryBars');
+            barsContainer.innerHTML = '';
+
+            if (categories.length === 0 || grandTotalExpenses === 0) {
+                noChartData.classList.remove('hidden');
+                categoryChartInstance.data.labels = [];
+                categoryChartInstance.data.datasets[0].data = [];
+                categoryChartInstance.update();
+                return;
+            } else {
+                noChartData.classList.add('hidden');
+            }
+
+            // Update Donut Chart
+            categoryChartInstance.data.labels = categories;
+            categoryChartInstance.data.datasets[0].data = dataValues;
+            categoryChartInstance.data.datasets[0].backgroundColor = bgColors;
+            categoryChartInstance.update();
+
+            // Render Dynamic Legend Progress Bars
+            categories.forEach(cat => {
+                const amount = totals[cat];
+                const percentage = Math.round((amount / grandTotalExpenses) * 100);
+                const color = categoryColors[cat] || '#64748b';
+
+                const div = document.createElement('div');
+                div.className = "text-xs space-y-1";
+                div.innerHTML = `
+                    <div class="flex justify-between font-medium">
+                        <span class="text-slate-700 flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: Php{color}"></span>
+                            Php{cat}
+                        </span>
+                        <span class="text-slate-500">Php{formatCurrency(amount)} (Php{percentage}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                        <div class="h-1.5 rounded-full transition-all duration-300" style="width: Php{percentage}%; background-color: Php{color}"></div>
+                    </div>
+                `;
+                barsContainer.appendChild(div);
+            });
+        }
+
+        // MODAL FUNCTIONS
+        function openBudgetModal() {
+            document.getElementById('budgetInput').value = weeklyBudget;
+            const modal = document.getElementById('budgetModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeBudgetModal() {
+            const modal = document.getElementById('budgetModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        function saveBudget() {
+            const inputVal = parseFloat(document.getElementById('budgetInput').value);
+            if (!isNaN(inputVal) && inputVal >= 0) {
+                weeklyBudget = inputVal;
+                saveToLocalStorage();
+                renderAll();
+                closeBudgetModal();
+                showToast("Weekly budget updated!");
+            } else {
+                showToast("Please enter a valid amount", "error");
+            }
+        }
+
+        // UTILITY FUNCTIONS
+        function formatCurrency(num) {
+            return 'Php' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = msg;
+
+            if (type === "error") {
+                toastIcon.className = "fa-solid fa-circle-exclamation text-rose-400";
+            } else if (type === "info") {
+                toastIcon.className = "fa-solid fa-circle-info text-sky-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
