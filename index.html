@@ -90,7 +90,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Weekly Target</p>
-                            <h2 id="displayBudget" class="text-2xl font-extrabold text-slate-800 mt-1">Php0.00</h2>
+                            <h2 id="displayBudget" class="text-2xl font-extrabold text-slate-800 mt-1">₱0.00</h2>
                         </div>
                         <div class="bg-blue-50 text-blue-600 p-3 rounded-xl">
                             <i class="fa-solid fa-bullseye text-lg"></i>
@@ -107,7 +107,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Income</p>
-                            <h2 id="displayIncome" class="text-2xl font-extrabold text-emerald-600 mt-1">Php0.00</h2>
+                            <h2 id="displayIncome" class="text-2xl font-extrabold text-emerald-600 mt-1">₱0.00</h2>
                         </div>
                         <div class="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
                             <i class="fa-solid fa-arrow-trend-up text-lg"></i>
@@ -123,7 +123,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Spent</p>
-                            <h2 id="displaySpent" class="text-2xl font-extrabold text-rose-600 mt-1">Php0.00</h2>
+                            <h2 id="displaySpent" class="text-2xl font-extrabold text-rose-600 mt-1">₱0.00</h2>
                         </div>
                         <div class="bg-rose-50 text-rose-600 p-3 rounded-xl">
                             <i class="fa-solid fa-arrow-trend-down text-lg"></i>
@@ -139,7 +139,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Remaining Balance</p>
-                            <h2 id="displayBalance" class="text-2xl font-extrabold text-slate-800 mt-1">Php0.00</h2>
+                            <h2 id="displayBalance" class="text-2xl font-extrabold text-slate-800 mt-1">₱0.00</h2>
                         </div>
                         <div id="balanceIconBg" class="bg-sky-50 text-sky-600 p-3 rounded-xl">
                             <i id="balanceIcon" class="fa-solid fa-scale-balanced text-lg"></i>
@@ -177,7 +177,7 @@
                     <!-- Amount & Category -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Amount (Php)</label>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Amount (₱)</label>
                             <input type="number" id="txAmount" step="0.01" min="0.01" placeholder="0.00" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-sm font-medium">
                         </div>
                         <div>
@@ -277,7 +277,7 @@
             <div id="dayContentCard" class="bg-slate-50 border border-slate-200/60 rounded-xl p-5">
                 <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
                     <h3 id="selectedDayTitle" class="font-bold text-slate-800 text-base">Monday</h3>
-                    <span id="selectedDayTotal" class="text-sm font-bold text-slate-700 bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">Total Spent: Php0.00</span>
+                    <span id="selectedDayTotal" class="text-sm font-bold text-slate-700 bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">Total Spent: ₱0.00</span>
                 </div>
                 <div id="dayTransactionsList" class="space-y-2.5 max-h-60 overflow-y-auto">
                     <!-- Populated dynamically -->
@@ -359,7 +359,7 @@
             <p class="text-xs text-slate-500 mb-5">Specify the maximum amount you plan to spend this week to keep track of your goals.</p>
             
             <div class="mb-5">
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Weekly Target Amount (Php)</label>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Weekly Target Amount (₱)</label>
                 <input type="number" id="budgetInput" step="0.01" min="0" placeholder="e.g. 500.00" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 text-base font-semibold">
             </div>
 
@@ -385,7 +385,7 @@
     <script>
         // State Management
         let transactions = [];
-        let weeklyBudget = 500;
+        let weeklyBudget = 5000;
         let activeType = 'expense';
         let currentDayTab = 'Monday';
         let categoryChartInstance = null;
@@ -429,7 +429,7 @@
             if (mm < 10) mm = '0' + mm;
             if (dd < 10) dd = '0' + dd;
 
-            const formattedToday = `Php{yyyy}-Php{mm}-Php{dd}`;
+            const formattedToday = `${yyyy}-${mm}-${dd}`;
             document.getElementById('txDate').value = formattedToday;
             autoSelectDay(formattedToday);
         }
@@ -460,10 +460,10 @@
             } else {
                 // Populate default demo data if empty
                 transactions = [
-                    { id: '1', type: 'income', amount: 800, category: 'Income', date: '2026-10-19', day: 'Monday', desc: 'Weekly Salary' },
-                    { id: '2', type: 'expense', amount: 45.50, category: 'Food', date: '2026-10-19', day: 'Monday', desc: 'Weekly Groceries' },
-                    { id: '3', type: 'expense', amount: 15.00, category: 'Transportation', date: '2026-10-20', day: 'Tuesday', desc: 'Bus Pass' },
-                    { id: '4', type: 'expense', amount: 65.00, category: 'Utilities', date: '2026-10-21', day: 'Wednesday', desc: 'Electricity Bill' }
+                    { id: '1', type: 'income', amount: 8000, category: 'Income', date: '2026-10-19', day: 'Monday', desc: 'Weekly Salary' },
+                    { id: '2', type: 'expense', amount: 450.50, category: 'Food', date: '2026-10-19', day: 'Monday', desc: 'Weekly Groceries' },
+                    { id: '3', type: 'expense', amount: 150.00, category: 'Transportation', date: '2026-10-20', day: 'Tuesday', desc: 'Commute / Fare' },
+                    { id: '4', type: 'expense', amount: 650.00, category: 'Utilities', date: '2026-10-21', day: 'Wednesday', desc: 'Electricity Bill' }
                 ];
                 saveToLocalStorage();
             }
@@ -477,7 +477,7 @@
         function resetAllData() {
             if (confirm("Are you sure you want to reset all budget data and transactions?")) {
                 localStorage.clear();
-                weeklyBudget = 500;
+                weeklyBudget = 5000;
                 transactions = [];
                 renderAll();
                 showToast("All data has been reset", "info");
@@ -509,11 +509,11 @@
             document.getElementById('displayIncome').innerText = formatCurrency(totalIncome);
             document.getElementById('displaySpent').innerText = formatCurrency(totalSpent);
             document.getElementById('displayBalance').innerText = formatCurrency(balance);
-            document.getElementById('spentPercentage').innerText = `Php{percentageUsed}%`;
+            document.getElementById('spentPercentage').innerText = `${percentageUsed}%`;
 
             // Progress Bar Animation & Color
             const progressBar = document.getElementById('budgetProgressBar');
-            progressBar.style.width = `Php{percentageUsed}%`;
+            progressBar.style.width = `${percentageUsed}%`;
 
             if (percentageUsed >= 90) {
                 progressBar.className = "bg-rose-500 h-2 rounded-full transition-all duration-500";
@@ -640,7 +640,7 @@
             // Update Active Tab UI
             const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
             days.forEach(d => {
-                const btn = document.getElementById(`tab-Php{d}`);
+                const btn = document.getElementById(`tab-${d}`);
                 if (d === currentDayTab) {
                     btn.className = "day-tab py-2.5 px-2 text-center rounded-xl transition text-xs font-bold bg-white text-sky-600 shadow-sm border border-slate-200/80";
                 } else {
@@ -654,13 +654,13 @@
             const dayExpenses = transactions.filter(t => t.day === currentDayTab && t.type === 'expense');
             const totalDaySpent = dayExpenses.reduce((acc, curr) => acc + curr.amount, 0);
 
-            document.getElementById('selectedDayTotal').innerText = `Total Spent: Php{formatCurrency(totalDaySpent)}`;
+            document.getElementById('selectedDayTotal').innerText = `Total Spent: ${formatCurrency(totalDaySpent)}`;
 
             const container = document.getElementById('dayTransactionsList');
             container.innerHTML = '';
 
             if (dayExpenses.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center italic">No expenses recorded for Php{currentDayTab}.</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center italic">No expenses recorded for ${currentDayTab}.</p>`;
                 return;
             }
 
@@ -672,15 +672,15 @@
                 div.className = "bg-white p-3 rounded-xl border border-slate-200/70 flex justify-between items-center text-xs shadow-2xs";
                 div.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white" style="background-color: Php{catColor}">
-                            <i class="fa-solid Php{iconClass}"></i>
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white" style="background-color: ${catColor}">
+                            <i class="fa-solid ${iconClass}"></i>
                         </div>
                         <div>
-                            <p class="font-semibold text-slate-800">Php{escapeHtml(tx.desc)}</p>
-                            <p class="text-[10px] text-slate-400">Php{tx.category} &bull; Php{tx.date}</p>
+                            <p class="font-semibold text-slate-800">${escapeHtml(tx.desc)}</p>
+                            <p class="text-[10px] text-slate-400">${tx.category} &bull; ${tx.date}</p>
                         </div>
                     </div>
-                    <span class="font-bold text-rose-600">-Php{formatCurrency(tx.amount)}</span>
+                    <span class="font-bold text-rose-600">-${formatCurrency(tx.amount)}</span>
                 `;
                 container.appendChild(div);
             });
@@ -721,25 +721,25 @@
                 tr.className = "hover:bg-slate-50/80 transition text-xs";
                 tr.innerHTML = `
                     <td class="py-3 px-4 font-medium text-slate-500 whitespace-nowrap">
-                        Php{tx.date} <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded ml-1">Php{tx.day.slice(0,3)}</span>
+                        ${tx.date} <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded ml-1">${tx.day.slice(0,3)}</span>
                     </td>
-                    <td class="py-3 px-4 font-medium text-slate-800">Php{escapeHtml(tx.desc)}</td>
+                    <td class="py-3 px-4 font-medium text-slate-800">${escapeHtml(tx.desc)}</td>
                     <td class="py-3 px-4 text-slate-600">
                         <span class="inline-flex items-center gap-1.5">
-                            <i class="fa-solid Php{iconClass} text-[10px] text-slate-400"></i>
-                            Php{tx.category}
+                            <i class="fa-solid ${iconClass} text-[10px] text-slate-400"></i>
+                            ${tx.category}
                         </span>
                     </td>
                     <td class="py-3 px-4">
-                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-md Php{badgeBg}">Php{tx.type}</span>
+                        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-md ${badgeBg}">${tx.type}</span>
                     </td>
-                    <td class="py-3 px-4 text-right Php{amountClass}">Php{amountPrefix}Php{formatCurrency(tx.amount)}</td>
+                    <td class="py-3 px-4 text-right ${amountClass}">${amountPrefix}${formatCurrency(tx.amount)}</td>
                     <td class="py-3 px-4 text-center">
                         <div class="flex items-center justify-center gap-2">
-                            <button onclick="editTransaction('Php{tx.id}')" title="Edit" class="text-slate-400 hover:text-sky-600 p-1 transition">
+                            <button onclick="editTransaction('${tx.id}')" title="Edit" class="text-slate-400 hover:text-sky-600 p-1 transition">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <button onclick="deleteTransaction('Php{tx.id}')" title="Delete" class="text-slate-400 hover:text-rose-600 p-1 transition">
+                            <button onclick="deleteTransaction('${tx.id}')" title="Delete" class="text-slate-400 hover:text-rose-600 p-1 transition">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
@@ -821,13 +821,13 @@
                 div.innerHTML = `
                     <div class="flex justify-between font-medium">
                         <span class="text-slate-700 flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: Php{color}"></span>
-                            Php{cat}
+                            <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${color}"></span>
+                            ${cat}
                         </span>
-                        <span class="text-slate-500">Php{formatCurrency(amount)} (Php{percentage}%)</span>
+                        <span class="text-slate-500">${formatCurrency(amount)} (${percentage}%)</span>
                     </div>
                     <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                        <div class="h-1.5 rounded-full transition-all duration-300" style="width: Php{percentage}%; background-color: Php{color}"></div>
+                        <div class="h-1.5 rounded-full transition-all duration-300" style="width: ${percentage}%; background-color: ${color}"></div>
                     </div>
                 `;
                 barsContainer.appendChild(div);
@@ -873,7 +873,7 @@
 
         // UTILITY FUNCTIONS
         function formatCurrency(num) {
-            return 'Php' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return '₱' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         function escapeHtml(str) {
